@@ -1,5 +1,6 @@
 import React from 'react';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 export type LoginState = {
   email: string;
@@ -26,7 +27,11 @@ export function useLoginViewModel() {
     });
     try {
       const credential = await auth().signInWithEmailAndPassword(state.email.trim(), state.password);
-      return { user: credential.user };
+      const uid = credential.user.uid;
+      const doc = await firestore().collection('users').doc(uid).get();
+      const exists = typeof (doc as any).exists === 'function' ? (doc as any).exists() : (doc as any).exists;
+      const data = exists ? (doc.data() as { isAdmin?: boolean; profileCompleted?: boolean }) : {};
+      return { user: credential.user, isAdmin: !!data?.isAdmin, profileCompleted: !!data?.profileCompleted };
     } catch (e) {
       const message = (e as Error)?.message ?? 'Login failed';
       setState(prev => ({ ...prev, error: message }));
