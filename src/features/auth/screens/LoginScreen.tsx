@@ -5,12 +5,13 @@ import AppTextField from "@/components/ui/AppTextField";
 import AppButton from "@/components/ui/AppButton";
 import { colors } from "@/theme/colors";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { showMessage } from "@/components/ui/Toast";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/AppNavigator";
 
 export default function LoginScreen() {
-  const { state, setEmail, setPassword, toggleRemember, submit } =
+  const { state, setEmail, setPassword, submit } =
     useLoginViewModel();
   const navigation = useNavigation<
     NativeStackNavigationProp<RootStackParamList>
@@ -18,9 +19,16 @@ export default function LoginScreen() {
 
   const onSignIn = React.useCallback(async () => {
     const result = await submit();
-    console.log("result", result);
     if (result?.user) {
-      navigation.replace("Home");
+      if (result.isAdmin) {
+        showMessage('Admin login successful');
+        return;
+      }
+      if (result.profileCompleted) {
+        showMessage('Welcome back');
+        return;
+      }
+      navigation.replace("ProfileSetup");
     }
   }, [navigation, submit]);
 

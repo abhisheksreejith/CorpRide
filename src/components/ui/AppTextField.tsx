@@ -9,11 +9,14 @@ type Props = {
   placeholder?: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'email-address';
+  keyboardType?: 'default' | 'email-address' | 'number-pad' | 'phone-pad' | 'numeric';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   leftIconName?: keyof typeof Ionicons.glyphMap;
   rightToggleSecure?: boolean;
   testID?: string;
+  rightIconName?: keyof typeof Ionicons.glyphMap | undefined;
+  onPressRightIcon?: (() => void) | undefined;
+  editable?: boolean;
 };
 
 export default function AppTextField({
@@ -27,6 +30,9 @@ export default function AppTextField({
   leftIconName,
   rightToggleSecure,
   testID,
+  rightIconName,
+  onPressRightIcon,
+  editable = true,
 }: Props) {
   const [isSecure, setIsSecure] = React.useState(!!secureTextEntry);
   const [focused, setFocused] = React.useState(false);
@@ -37,14 +43,15 @@ export default function AppTextField({
       <View
         style={[
           styles.inputRow,
-          focused && { borderColor: colors.accent, backgroundColor: colors.accentTint },
+          focused && editable && { borderColor: colors.accent, backgroundColor: colors.accentTint },
+          !editable && { opacity: 0.85 },
         ]}
       >
         {leftIconName ? (
           <Ionicons
             name={leftIconName}
             size={18}
-            color={focused ? colors.accent : colors.placeholder}
+            color={focused && editable ? colors.accent : colors.placeholder}
             style={styles.leftIcon}
           />
         ) : null}
@@ -60,13 +67,22 @@ export default function AppTextField({
           autoCapitalize={autoCapitalize}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
+          editable={editable}
         />
         {rightToggleSecure ? (
           <TouchableOpacity onPress={() => setIsSecure(prev => !prev)}>
             <Ionicons
               name={isSecure ? 'eye-off-outline' : 'eye-outline'}
               size={18}
-              color={focused ? colors.accent : colors.placeholder}
+              color={focused && editable ? colors.accent : colors.placeholder}
+            />
+          </TouchableOpacity>
+        ) : rightIconName ? (
+          <TouchableOpacity disabled={!onPressRightIcon} onPress={onPressRightIcon}>
+            <Ionicons
+              name={rightIconName}
+              size={18}
+              color={focused && editable ? colors.accent : colors.placeholder}
             />
           </TouchableOpacity>
         ) : null}
