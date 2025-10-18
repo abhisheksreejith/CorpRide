@@ -9,6 +9,7 @@ import { showMessage } from "@/components/ui/Toast";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/AppNavigator";
+import { useGoogleSSO } from "@/features/auth/viewmodels/useGoogleSSO";
 
 export default function LoginScreen() {
   const { state, setEmail, setPassword, submit } =
@@ -16,6 +17,11 @@ export default function LoginScreen() {
   const navigation = useNavigation<
     NativeStackNavigationProp<RootStackParamList>
   >();
+
+  const { promptAsync: promptGoogle, request: googleRequest } = useGoogleSSO(
+    "787315371389-37qr8o4d864e4r4eipmle0pt80l4v2ek.apps.googleusercontent.com",
+    "787315371389-avsh3o6go9a2fsf4o2vdf4fe7b3iq7h9.apps.googleusercontent.com"
+  );
 
   const onSignIn = React.useCallback(async () => {
     const result = await submit();
@@ -68,6 +74,14 @@ export default function LoginScreen() {
           onPress={onSignIn}
           disabled={state.isSubmitting || !state.email || !state.password}
         />
+
+        <TouchableOpacity
+          style={[styles.linkButton, { marginTop: 12 }]}
+          disabled={!googleRequest}
+          onPress={() => googleRequest && promptGoogle()}
+        >
+          <Text style={styles.linkText}>Continue with Google</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.linkButton}>
           <Text style={styles.linkText}>Forgot the password?</Text>

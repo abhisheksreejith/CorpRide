@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		03B068E7BC482AEE713D4F1F /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39C3A998F31A6FDF4AFA4570 /* ExpoModulesProvider.swift */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		380112AC2EA3B5D500BF62F1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 380112AB2EA3B5D500BF62F1 /* GoogleService-Info.plist */; };
+		380112AE2EA3DABF00BF62F1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 380112AD2EA3DABF00BF62F1 /* GoogleService-Info.plist */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
 		64683CE5A5A52F3FC1594E25 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AEBEA4FA50A82EB9ECF1D114 /* PrivacyInfo.xcprivacy */; };
 		696BCCB562E7BAEA1C9CC6C5 /* libPods-CorpRide.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 504A764E21E013A722E96FEB /* libPods-CorpRide.a */; };
@@ -21,7 +21,7 @@
 		13B07F961A680F5B00A75B9A /* CorpRide.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CorpRide.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = CorpRide/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = CorpRide/Info.plist; sourceTree = "<group>"; };
-		380112AB2EA3B5D500BF62F1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		380112AD2EA3DABF00BF62F1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		39C3A998F31A6FDF4AFA4570 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-CorpRide/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		504A764E21E013A722E96FEB /* libPods-CorpRide.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CorpRide.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9AF7B1570972165062525399 /* Pods-CorpRide.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CorpRide.debug.xcconfig"; path = "Target Support Files/Pods-CorpRide/Pods-CorpRide.debug.xcconfig"; sourceTree = "<group>"; };
@@ -49,7 +49,7 @@
 		13B07FAE1A68108700A75B9A /* CorpRide */ = {
 			isa = PBXGroup;
 			children = (
-				380112AB2EA3B5D500BF62F1 /* GoogleService-Info.plist */,
+				380112AD2EA3DABF00BF62F1 /* GoogleService-Info.plist */,
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
 				F11748442D0722820044C1D9 /* CorpRide-Bridging-Header.h */,
 				BB2F792B24A3F905000567C9 /* Supporting */,
@@ -198,8 +198,8 @@
 			files = (
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				380112AC2EA3B5D500BF62F1 /* GoogleService-Info.plist in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
+				380112AE2EA3DABF00BF62F1 /* GoogleService-Info.plist in Resources */,
 				64683CE5A5A52F3FC1594E25 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

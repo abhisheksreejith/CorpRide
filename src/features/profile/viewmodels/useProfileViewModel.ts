@@ -9,6 +9,8 @@ export type ProfileFormState = {
   phone: string;
   gender: 'Male' | 'Female' | 'Other' | '';
   address: string;
+  latitude: number | null;
+  longitude: number | null;
   isFetchingAddress: boolean;
 };
 
@@ -20,6 +22,8 @@ export function useProfileViewModel() {
     phone: '',
     gender: '',
     address: '',
+    latitude: null,
+    longitude: null,
     isFetchingAddress: false,
   });
 
@@ -33,18 +37,22 @@ export function useProfileViewModel() {
       return false;
     }
     try {
-      await firestore().collection('users').doc(user.uid).set(
-        {
-          fullName: state.fullName,
-          email: state.email,
-          phone: state.phone,
-          gender: state.gender,
-          address: state.address,
-          profileCompleted: true,
-          updatedAt: firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
+      const payload: Record<string, unknown> = {
+        fullName: state.fullName,
+        email: state.email,
+        phone: state.phone,
+        gender: state.gender,
+        address: state.address,
+        profileCompleted: true,
+        updatedAt: firestore.FieldValue.serverTimestamp(),
+      };
+      if (state.latitude != null && state.longitude != null) {
+        payload.location = new firestore.GeoPoint(state.latitude, state.longitude);
+        payload.latitude = state.latitude; // optional: flat fields for querying convenience
+        payload.longitude = state.longitude;
+      }
+
+      await firestore().collection('users').doc(user.uid).set(payload, { merge: true });
       showMessage('Profile saved');
       return true;
     } catch (e) {
@@ -64,21 +72,29 @@ export function useProfileViewModel() {
         return false;
       }
       const position = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const [place] = await Location.reverseGeocodeAsync({
+      const results = await Location.reverseGeocodeAsync({
         latitude: position.coords.latitude,
         longitude: position.coords.longitude,
       });
+      const place = results?.[0];
+      const safe = (v?: string | null) => (typeof v === 'string' ? v : undefined);
       const composed = [
-        place.name,
-        place.street,
-        place.postalCode,
-        place.city || place.subregion,
-        place.region,
-        place.country,
+        safe(place?.name),
+        safe(place?.street),
+        safe(place?.postalCode),
+        safe(place?.city) || safe(place?.subregion),
+        safe(place?.region),
+        safe(place?.country),
       ]
         .filter(Boolean)
         .join(', ');
-      setState(prev => ({ ...prev, address: composed, isFetchingAddress: false }));
+      setState(prev => ({
+        ...prev,
+        address: composed,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        isFetchingAddress: false,
+      }));
       return true;
     } catch {
       setState(prev => ({ ...prev, isFetchingAddress: false }));
@@ -95,7 +111,7 @@ export function useProfileViewModel() {
         const doc = await firestore().collection('users').doc(user.uid).get();
         const exists = typeof (doc as any).exists === 'function' ? (doc as any).exists() : (doc as any).exists;
         if (!exists) return;
-        const data = doc.data() as Partial<ProfileFormState> | undefined;
+        const data = doc.data() as any;
         if (!data) return;
         setState(prev => ({
           ...prev,
@@ -104,6 +120,8 @@ export function useProfileViewModel() {
           phone: typeof data.phone === 'string' ? data.phone : prev.phone,
           gender: (data.gender as ProfileFormState['gender']) ?? prev.gender,
           address: typeof data.address === 'string' ? data.address : prev.address,
+          latitude: typeof data.latitude === 'number' ? data.latitude : (data.location?.latitude ?? prev.latitude ?? null),
+          longitude: typeof data.longitude === 'number' ? data.longitude : (data.location?.longitude ?? prev.longitude ?? null),
         }));
       } catch {
         // ignore silently for now

@@ -55,5 +55,14 @@
 	<string>Your location is used to auto-fill your address.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Your location is used to auto-fill your address even in the background.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>corpride</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
