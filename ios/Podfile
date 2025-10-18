@@ -20,6 +20,30 @@ platform :ios, podfile_properties['ios.deploymentTarget'] || '15.1'
 
 prepare_react_native_project!
 
+static_frameworks = [
+  'FirebaseAuth',
+  'FirebaseAuthInterop',
+  'FirebaseAppCheckInterop',
+  'FirebaseCore',
+  'FirebaseCoreExtension',
+  'GoogleUtilities',
+  'RecaptchaInterop',
+  'FirebaseCoreInternal',
+  'FirebaseFirestoreInternal',
+  'FirebaseFirestore',
+]
+
+pre_install do |installer|
+  installer.pod_targets.each do |pod|
+    if static_frameworks.include?(pod.name)
+      puts "Configuring #{pod.name} as static framework"
+      def pod.build_type
+        Pod::BuildType.new(:linkage => :static, :packaging => :framework)
+      end
+    end
+  end
+end
+
 target 'CorpRide' do
   use_expo_modules!
 
@@ -38,8 +62,8 @@ target 'CorpRide' do
 
   config = use_native_modules!(config_command)
 
-  use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
-  use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
+  # use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
+  # use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
 
   use_react_native!(
     :path => config[:reactNativePath],
