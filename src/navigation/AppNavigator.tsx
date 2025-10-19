@@ -7,6 +7,8 @@ import AddressSelectScreen from '@/features/profile/screens/AddressSelectScreen'
 import SavedAddressesScreen from '@/features/profile/screens/SavedAddressesScreen';
 import ScheduleFormScreen from '@/features/schedule/screens/ScheduleFormScreen';
 import ScheduleAdminScreen from '@/features/schedule/screens/ScheduleAdminScreen';
+import ChangeRequestScreen from '@/features/schedule/screens/ChangeRequestScreen';
+import TripOperationsScreen from '@/features/schedule/screens/TripOperationsScreen';
 import { colors } from '@/theme/colors';
 import HomeTabs from '@/navigation/HomeTabs';
 
@@ -18,6 +20,8 @@ export type RootStackParamList = {
   SavedAddresses: undefined;
   ScheduleForm: undefined;
   ScheduleAdmin: undefined;
+  ChangeRequest: { weekStartISO: string; day: import('@/features/schedule/types').DayKey; current?: { time?: string; addressId?: string; addressName?: string } };
+  TripOperations: { weekStartISO: string; day: import('@/features/schedule/types').DayKey; scheduledTime?: string; addressName?: string };
   HomeTabs: undefined;
 };
 
@@ -39,6 +43,8 @@ export default function AppNavigator() {
       <Stack.Screen name="SavedAddresses" component={SavedAddressesScreen} />
       <Stack.Screen name="ScheduleForm" component={ScheduleFormScreen} />
       <Stack.Screen name="ScheduleAdmin" component={ScheduleAdminScreen} />
+      <Stack.Screen name="ChangeRequest" component={ChangeRequestScreen} />
+      <Stack.Screen name="TripOperations" component={TripOperationsScreen} />
       <Stack.Screen name="HomeTabs" component={HomeTabs} />
     </Stack.Navigator>
   );
