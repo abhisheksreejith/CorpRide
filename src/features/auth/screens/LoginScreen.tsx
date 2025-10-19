@@ -40,30 +40,7 @@ export default function LoginScreen() {
     }
   }, [navigation, submit]);
 
-  // Handle Google SSO path: once Firebase auth state changes, route accordingly
-  React.useEffect(() => {
-    const unsub = auth().onAuthStateChanged(async (user) => {
-      if (!user) return;
-      try {
-        const doc = await firestore().collection('users').doc(user.uid).get();
-        const exists = typeof (doc as any).exists === 'function' ? (doc as any).exists() : (doc as any).exists;
-        const data = exists ? (doc.data() as { isAdmin?: boolean; profileCompleted?: boolean }) : {};
-        if (data?.isAdmin) {
-          navigation.replace('ScheduleAdmin');
-          return;
-        }
-        if (data?.profileCompleted) {
-          navigation.replace('HomeTabs');
-          return;
-        }
-        navigation.replace('ProfileSetup');
-      } catch {
-        // best-effort routing; fall back to profile setup
-        navigation.replace('ProfileSetup');
-      }
-    });
-    return unsub;
-  }, [navigation]);
+  // Removed auth state listener here to avoid double navigation; AuthGate handles routing
 
   return (
     <SafeAreaView
@@ -97,8 +74,9 @@ export default function LoginScreen() {
           <Text style={styles.errorText}>{state.error}</Text>
         )}
         <AppButton
-          title={state.isSubmitting ? "Signing in..." : "Sign in"}
+          title="Sign in"
           onPress={onSignIn}
+          isLoading={state.isSubmitting}
           disabled={state.isSubmitting || !state.email || !state.password}
         />
 
