@@ -1,10 +1,8 @@
 export type DayKey = 'Mon' | 'Tue' | 'Wed' | 'Thu' | 'Fri' | 'Sat' | 'Sun';
 
-export type LocationType = 'Home' | 'Office';
-
 export type DaySchedule = {
-  pickup?: { time: string; location: LocationType };
-  drop?: { time: string; location: LocationType };
+  pickup?: { time: string; addressId?: string; addressName?: string };
+  drop?: { addressId?: string; addressName?: string };
 };
 
 export type WeekSchedule = Record<DayKey, DaySchedule>;

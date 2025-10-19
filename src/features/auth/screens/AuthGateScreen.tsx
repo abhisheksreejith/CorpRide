@@ -25,7 +25,7 @@ export default function AuthGateScreen() {
           return;
         }
         if (data?.profileCompleted) {
-          navigation.reset({ index: 0, routes: [{ name: 'ScheduleForm' }] });
+          navigation.reset({ index: 0, routes: [{ name: 'HomeTabs' }] });
           return;
         }
         navigation.reset({ index: 0, routes: [{ name: 'ProfileSetup' }] });

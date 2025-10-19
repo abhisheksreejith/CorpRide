@@ -18,11 +18,12 @@ export default function ProfileSetupScreen() {
   const picked = (route.params as any)?.pickedAddress as { formattedAddress: string; latitude: number; longitude: number } | undefined;
   const [genderPickerVisible, setGenderPickerVisible] = React.useState(false);
   const insets = useSafeAreaInsets();
+  const canGoBack = navigation.canGoBack();
 
   const onContinue = React.useCallback(async () => {
     const ok = await submit();
     if (ok) {
-      navigation.reset({ index: 0, routes: [{ name: 'ScheduleForm' }] });
+      navigation.reset({ index: 0, routes: [{ name: 'HomeTabs' }] });
     }
   }, [submit, navigation]);
 
@@ -38,7 +39,15 @@ export default function ProfileSetupScreen() {
     <SafeAreaView style={styles.container} edges={["top", "left", "right", "bottom"]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.content}>
-        <Text style={styles.title}>Fill Your Profile</Text>
+        <View style={styles.headerRow}>
+          {canGoBack ? (
+            <TouchableOpacity accessibilityRole="button" onPress={() => navigation.goBack()} style={styles.backButton}>
+              <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
+            </TouchableOpacity>
+          ) : <View style={{ width: 24 }} />}
+          <Text style={styles.title}>Edit Profile</Text>
+          <View style={{ width: 24 }} />
+        </View>
 
         <View style={styles.avatarWrapper}>
           <View style={styles.avatar}>
@@ -106,6 +115,22 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     gap: 16,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 4,
+  },
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   footer: {
     paddingHorizontal: 20,

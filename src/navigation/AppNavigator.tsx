@@ -8,6 +8,7 @@ import SavedAddressesScreen from '@/features/profile/screens/SavedAddressesScree
 import ScheduleFormScreen from '@/features/schedule/screens/ScheduleFormScreen';
 import ScheduleAdminScreen from '@/features/schedule/screens/ScheduleAdminScreen';
 import { colors } from '@/theme/colors';
+import HomeTabs from '@/navigation/HomeTabs';
 
 export type RootStackParamList = {
   AuthGate: undefined;
@@ -17,6 +18,7 @@ export type RootStackParamList = {
   SavedAddresses: undefined;
   ScheduleForm: undefined;
   ScheduleAdmin: undefined;
+  HomeTabs: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -37,6 +39,7 @@ export default function AppNavigator() {
       <Stack.Screen name="SavedAddresses" component={SavedAddressesScreen} />
       <Stack.Screen name="ScheduleForm" component={ScheduleFormScreen} />
       <Stack.Screen name="ScheduleAdmin" component={ScheduleAdminScreen} />
+      <Stack.Screen name="HomeTabs" component={HomeTabs} />
     </Stack.Navigator>
   );
 }

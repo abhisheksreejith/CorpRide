@@ -33,7 +33,7 @@ export default function LoginScreen() {
         return;
       }
       if (result.profileCompleted) {
-        navigation.replace("ScheduleForm");
+        navigation.replace("HomeTabs");
         return;
       }
       navigation.replace("ProfileSetup");
@@ -53,7 +53,7 @@ export default function LoginScreen() {
           return;
         }
         if (data?.profileCompleted) {
-          navigation.replace('ScheduleForm');
+          navigation.replace('HomeTabs');
           return;
         }
         navigation.replace('ProfileSetup');

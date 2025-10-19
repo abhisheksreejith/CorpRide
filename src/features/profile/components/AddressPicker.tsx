@@ -6,9 +6,9 @@ import { GOOGLE_MAPS_API_KEY } from '@/config/maps';
 import { colors } from '@/theme/colors';
 
 type Props = {
-  initialText?: string;
-  latitude?: number | null;
-  longitude?: number | null;
+  initialText?: string | undefined;
+  latitude?: number | null | undefined;
+  longitude?: number | null | undefined;
   onChange: (val: { formattedAddress: string; latitude: number; longitude: number; placeId?: string }) => void;
   fullHeight?: boolean;
 };
@@ -95,11 +95,19 @@ export default function AddressPicker({ initialText, latitude, longitude, onChan
 
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
+      // Try Google Geocoding API first
       const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${GOOGLE_MAPS_API_KEY}`;
       const res = await fetch(url);
       const json = await res.json();
-      const formatted = json?.results?.[0]?.formatted_address as string | undefined;
-      return formatted;
+      let formatted = json?.results?.[0]?.formatted_address as string | undefined;
+      if (formatted) return formatted;
+      // Fallback to Expo Location reverse geocode
+      const results = await Location.reverseGeocodeAsync({ latitude: lat, longitude: lng });
+      const p = results?.[0];
+      formatted = [p?.name, p?.street, p?.postalCode, p?.city || p?.subregion, p?.region, p?.country]
+        .filter(Boolean)
+        .join(', ');
+      return formatted || undefined;
     } catch {
       return undefined;
     }

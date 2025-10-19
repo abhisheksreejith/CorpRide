@@ -2,13 +2,15 @@ import React from 'react';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { showMessage } from '@/components/ui/Toast';
-import { DayKey, LocationType, WeekSchedule, getNextWeekMonday, isDeadlinePassed } from '@/features/schedule/types';
+import { DayKey, WeekSchedule, getNextWeekMonday, isDeadlinePassed } from '@/features/schedule/types';
+import { SavedAddress } from '@/features/profile/viewmodels/useSavedAddressesViewModel';
 
 export type ScheduleFormState = {
   weekStartISO: string;
   schedule: WeekSchedule;
   locked: boolean;
   isSubmitting: boolean;
+  addresses: SavedAddress[];
 };
 
 const DAY_KEYS: DayKey[] = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -27,6 +29,7 @@ export function useScheduleFormViewModel(deadline: { weekday: number; hour: numb
     schedule: emptyWeek(),
     locked: false,
     isSubmitting: false,
+    addresses: [],
   });
 
   // Compute deadline = Friday 5 PM of current week (before nextMonday)
@@ -42,14 +45,27 @@ export function useScheduleFormViewModel(deadline: { weekday: number; hour: numb
     setState(prev => ({ ...prev, locked }));
   }, [deadlineDate]);
 
-  const setDay = (day: DayKey, type: 'pickup' | 'drop', time: string, location: LocationType) => {
+  // Load saved addresses for dropdowns
+  React.useEffect(() => {
+    const user = auth().currentUser;
+    if (!user) return;
+    const ref = firestore().collection('users').doc(user.uid).collection('addresses').orderBy('createdAt', 'desc');
+    const unsub = ref.onSnapshot(snap => {
+      const arr: SavedAddress[] = [] as any;
+      snap.forEach(d => arr.push({ id: d.id, ...(d.data() as any) }));
+      setState(prev => ({ ...prev, addresses: arr }));
+    });
+    return unsub;
+  }, []);
+
+  const setDay = (day: DayKey, type: 'pickup', time: string, address?: { id: string; name: string }) => {
     setState(prev => ({
       ...prev,
       schedule: {
         ...prev.schedule,
         [day]: {
           ...prev.schedule[day],
-          [type]: { time, location },
+          [type]: { time, addressId: address?.id, addressName: address?.name },
         },
       },
     }));
@@ -63,6 +79,16 @@ export function useScheduleFormViewModel(deadline: { weekday: number; hour: numb
     const user = auth().currentUser;
     if (!user) {
       showMessage('Not authenticated', 'error');
+      return false;
+    }
+    // Require at least one scheduled pickup or drop with time and address
+    const hasAny = Object.values(state.schedule).some((day) => {
+      const p = day.pickup;
+      const pValid = !!(p && p.time && p.addressId);
+      return pValid;
+    });
+    if (!hasAny) {
+      showMessage('Add at least one pickup or drop before submitting', 'error');
       return false;
     }
     setState(prev => ({ ...prev, isSubmitting: true }));
