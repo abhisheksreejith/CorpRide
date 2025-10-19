@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,6 +19,7 @@ export default function ScheduleAdminScreen() {
   const { items, loading, updateStatus } = useScheduleAdminViewModel();
   const [userNames, setUserNames] = React.useState<Record<string, string>>({});
   const navigation = useNavigation<any>();
+  const [pendingId, setPendingId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     // Load names for visible users
@@ -76,20 +78,32 @@ export default function ScheduleAdminScreen() {
               {(item.status === 'submitted' || item.status === 'draft') && (
                 <View style={styles.actionsRow}>
                   <TouchableOpacity
-                    onPress={() =>
-                      updateStatus(`${item.uid}_${item.weekStartISO}`, "approved")
-                    }
+                    onPress={async () => {
+                      const id = `${item.uid}_${item.weekStartISO}`;
+                      setPendingId(id + '_approved');
+                      try { await updateStatus(id, 'approved'); } finally { setPendingId(null); }
+                    }}
                     style={styles.chipApprove}
                   >
-                    <Text style={styles.chipTextApprove}>Approve</Text>
+                    {pendingId === `${item.uid}_${item.weekStartISO}_approved` ? (
+                      <ActivityIndicator size="small" color={colors.accent} />
+                    ) : (
+                      <Text style={styles.chipTextApprove}>Approve</Text>
+                    )}
                   </TouchableOpacity>
                   <TouchableOpacity
-                    onPress={() =>
-                      updateStatus(`${item.uid}_${item.weekStartISO}`, "rejected")
-                    }
+                    onPress={async () => {
+                      const id = `${item.uid}_${item.weekStartISO}`;
+                      setPendingId(id + '_rejected');
+                      try { await updateStatus(id, 'rejected'); } finally { setPendingId(null); }
+                    }}
                     style={styles.chipReject}
                   >
-                    <Text style={styles.chipTextReject}>Reject</Text>
+                    {pendingId === `${item.uid}_${item.weekStartISO}_rejected` ? (
+                      <ActivityIndicator size="small" color={colors.textSecondary} />
+                    ) : (
+                      <Text style={styles.chipTextReject}>Reject</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               )}

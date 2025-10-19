@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, Text, StyleSheet, ViewStyle } from "react-native";
+import { TouchableOpacity, Text, StyleSheet, ViewStyle, ActivityIndicator } from "react-native";
 import { colors } from "@/theme/colors";
 
 type Props = {
@@ -9,6 +9,7 @@ type Props = {
   style?: ViewStyle;
   testID?: string;
   variant?: "primary" | "secondary" | "success" | "danger";
+  isLoading?: boolean;
 };
 
 export default function AppButton({
@@ -18,6 +19,7 @@ export default function AppButton({
   style,
   testID,
   variant = "primary",
+  isLoading = false,
 }: Props) {
   let backgroundColor: string = colors.accent as string;
   let textColor: string = "#1C1C1C";
@@ -36,7 +38,7 @@ export default function AppButton({
       testID={testID}
       accessibilityRole="button"
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       style={[
         styles.button,
         { backgroundColor },
@@ -44,7 +46,11 @@ export default function AppButton({
         style,
       ]}
     >
-      <Text style={[styles.text, { color: textColor }]}>{title}</Text>
+      {isLoading ? (
+        <ActivityIndicator size="small" color={textColor} />
+      ) : (
+        <Text style={[styles.text, { color: textColor }]}>{title}</Text>
+      )}
     </TouchableOpacity>
   );
 }
