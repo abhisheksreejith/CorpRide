@@ -10,6 +10,8 @@ import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/AppNavigator";
 import { useGoogleSSO } from "@/features/auth/viewmodels/useGoogleSSO";
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 
 export default function LoginScreen() {
   const { state, setEmail, setPassword, submit } =
@@ -27,16 +29,41 @@ export default function LoginScreen() {
     const result = await submit();
     if (result?.user) {
       if (result.isAdmin) {
-        showMessage('Admin login successful');
+        navigation.replace("ScheduleAdmin");
         return;
       }
       if (result.profileCompleted) {
-        showMessage('Welcome back');
+        navigation.replace("HomeTabs");
         return;
       }
       navigation.replace("ProfileSetup");
     }
   }, [navigation, submit]);
+
+  // Handle Google SSO path: once Firebase auth state changes, route accordingly
+  React.useEffect(() => {
+    const unsub = auth().onAuthStateChanged(async (user) => {
+      if (!user) return;
+      try {
+        const doc = await firestore().collection('users').doc(user.uid).get();
+        const exists = typeof (doc as any).exists === 'function' ? (doc as any).exists() : (doc as any).exists;
+        const data = exists ? (doc.data() as { isAdmin?: boolean; profileCompleted?: boolean }) : {};
+        if (data?.isAdmin) {
+          navigation.replace('ScheduleAdmin');
+          return;
+        }
+        if (data?.profileCompleted) {
+          navigation.replace('HomeTabs');
+          return;
+        }
+        navigation.replace('ProfileSetup');
+      } catch {
+        // best-effort routing; fall back to profile setup
+        navigation.replace('ProfileSetup');
+      }
+    });
+    return unsub;
+  }, [navigation]);
 
   return (
     <SafeAreaView
@@ -75,13 +102,13 @@ export default function LoginScreen() {
           disabled={state.isSubmitting || !state.email || !state.password}
         />
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[styles.linkButton, { marginTop: 12 }]}
           disabled={!googleRequest}
           onPress={() => googleRequest && promptGoogle()}
         >
           <Text style={styles.linkText}>Continue with Google</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity style={styles.linkButton}>
           <Text style={styles.linkText}>Forgot the password?</Text>

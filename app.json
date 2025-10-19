@@ -3,6 +3,11 @@
     "name": "CorpRide",
     "slug": "CorpRide",
     "version": "1.0.0",
-    "scheme": "corpride"
+    "scheme": "corpride",
+    "extra": {
+      "eas": {
+        "projectId": "corpride-local"
+      }
+    }
   }
 }
