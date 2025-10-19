@@ -72,25 +72,27 @@ export default function ScheduleAdminScreen() {
                 User: {userNames[item.uid] ?? item.uid}
               </Text>
               <Text style={styles.cardSub}>Week: {item.weekStartISO}</Text>
-              <Text style={styles.cardSub}>Status: {item.status}</Text>
-              <View style={styles.actionsRow}>
-                <TouchableOpacity
-                  onPress={() =>
-                    updateStatus(`${item.uid}_${item.weekStartISO}`, "approved")
-                  }
-                  style={styles.chipApprove}
-                >
-                  <Text style={styles.chipTextApprove}>Approve</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() =>
-                    updateStatus(`${item.uid}_${item.weekStartISO}`, "rejected")
-                  }
-                  style={styles.chipReject}
-                >
-                  <Text style={styles.chipTextReject}>Reject</Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.cardSub}>Status: {item.status === "approved" ? "Approved" : item.status === "rejected" ? "Rejected" : item.status === "submitted" ? "Submitted" : "Pending"}</Text>
+              {(item.status === 'submitted' || item.status === 'draft') && (
+                <View style={styles.actionsRow}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      updateStatus(`${item.uid}_${item.weekStartISO}`, "approved")
+                    }
+                    style={styles.chipApprove}
+                  >
+                    <Text style={styles.chipTextApprove}>Approve</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() =>
+                      updateStatus(`${item.uid}_${item.weekStartISO}`, "rejected")
+                    }
+                    style={styles.chipReject}
+                  >
+                    <Text style={styles.chipTextReject}>Reject</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           )}
         />
