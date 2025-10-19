@@ -27,6 +27,13 @@ export function getNextWeekMonday(date = new Date()): Date {
   return d;
 }
 
+export function formatDateYMDLocal(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 export function formatTimeHHmm(date: Date): string {
   const hh = String(date.getHours()).padStart(2, '0');
   const mm = String(date.getMinutes()).padStart(2, '0');
@@ -40,20 +47,17 @@ export function isDeadlinePassed(now: Date, deadline: Date) {
 
 // Maps a weekStartISO (Monday) and a DayKey to a concrete Date
 export function getDateForWeekDay(weekStartISO: string, day: DayKey): Date {
-  const base = new Date(weekStartISO);
-  base.setHours(0, 0, 0, 0);
-  const offsets: Record<DayKey, number> = {
-    Mon: 0,
-    Tue: 1,
-    Wed: 2,
-    Thu: 3,
-    Fri: 4,
-    Sat: 5,
-    Sun: 6,
-  };
-  const d = new Date(base);
-  d.setDate(base.getDate() + offsets[day]);
-  return d;
+  // Parse weekStartISO (YYYY-MM-DD) as LOCAL date to avoid timezone shifts
+  const parts = weekStartISO.split('-').map((v) => parseInt(v, 10));
+  const year = parts[0] ?? new Date().getFullYear();
+  const monthIndex = (parts[1] ?? 1) - 1;
+  const dayOfMonth = parts[2] ?? 1;
+  const baseDate = new Date(year, monthIndex, dayOfMonth);
+  baseDate.setHours(0, 0, 0, 0);
+  const offsets: Record<DayKey, number> = { Mon: 0, Tue: 1, Wed: 2, Thu: 3, Fri: 4, Sat: 5, Sun: 6 };
+  const result = new Date(baseDate);
+  result.setDate(baseDate.getDate() + offsets[day]);
+  return result;
 }
 
 export function isAtLeastNDaysAway(target: Date, n: number): boolean {

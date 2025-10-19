@@ -58,6 +58,28 @@ export function useScheduleFormViewModel(deadline: { weekday: number; hour: numb
     return unsub;
   }, []);
 
+  // Lock if a schedule already exists for this user & week
+  React.useEffect(() => {
+    (async () => {
+      const user = auth().currentUser;
+      if (!user) return;
+      try {
+        const docId = `${user.uid}_${state.weekStartISO}`;
+        const doc = await firestore().collection('schedules').doc(docId).get();
+        const exists = (doc as any)?.exists ?? (doc as any)?.exists();
+        if (exists) {
+          const data = doc.data() as any;
+          setState(prev => ({
+            ...prev,
+            locked: true,
+            // Optionally surface previously submitted data
+            schedule: (data?.schedule as any) ?? prev.schedule,
+          }));
+        }
+      } catch {}
+    })();
+  }, [state.weekStartISO]);
+
   const setDay = (day: DayKey, type: 'pickup', time: string, address?: { id: string; name: string }) => {
     setState(prev => ({
       ...prev,
@@ -73,7 +95,7 @@ export function useScheduleFormViewModel(deadline: { weekday: number; hour: numb
 
   const submit = async () => {
     if (state.locked) {
-      showMessage('Submission window is closed', 'error');
+      showMessage('This week\'s schedule is already submitted', 'error');
       return false;
     }
     const user = auth().currentUser;
@@ -100,10 +122,14 @@ export function useScheduleFormViewModel(deadline: { weekday: number; hour: numb
         status: 'submitted' as const,
         createdAt: Date.now(),
       };
-      await firestore()
-        .collection('schedules')
-        .doc(`${user.uid}_${state.weekStartISO}`)
-        .set(payload, { merge: true });
+      const ref = firestore().collection('schedules').doc(`${user.uid}_${state.weekStartISO}`);
+      const existing = await ref.get();
+      const exists = (existing as any)?.exists ?? (existing as any)?.exists();
+      if (exists) {
+        showMessage('This week\'s schedule already exists', 'error');
+        return false;
+      }
+      await ref.set(payload, { merge: false });
       showMessage('Schedule submitted');
       return true;
     } catch (e) {

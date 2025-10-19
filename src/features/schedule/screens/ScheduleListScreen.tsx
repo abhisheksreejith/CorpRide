@@ -9,6 +9,9 @@ import {
   Image,
   TouchableOpacity,
   useWindowDimensions,
+  Linking,
+  Alert,
+  Platform,
 } from "react-native";
 import { Animated } from "react-native";
 import {
@@ -42,8 +45,28 @@ export default function ScheduleListScreen() {
   const scrollX = React.useRef(new Animated.Value(0)).current;
   const pagerRef = React.useRef<any>(null);
   const insets = useSafeAreaInsets();
-  const { state, setTab, onRefresh } = useScheduleListViewModel();
-  const { loading, refreshing, tab, sections, completed, rejectedData } = state;
+  const { state, setTab, onRefresh, seedTodayForTest } =
+    useScheduleListViewModel();
+  const {
+    loading,
+    refreshing,
+    tab,
+    sections,
+    upcoming,
+    completed,
+    rejectedData,
+  } = state;
+  const [showActions, setShowActions] = React.useState(false);
+  const onSOS = React.useCallback(async () => {
+    try {
+      const scheme = Platform.OS === "ios" ? "telprompt:" : "tel:";
+      await Linking.openURL(`${scheme}100`);
+    } catch {
+      try {
+        Alert.alert("Unable to start call", "Please dial 100 manually.");
+      } catch {}
+    }
+  }, []);
 
   // Data and handlers are provided by the viewmodel
 
@@ -353,12 +376,41 @@ export default function ScheduleListScreen() {
           </View>
         </Animated.ScrollView>
       )}
+      {showActions && (
+        <View style={[styles.actionsPanel, { bottom: insets.bottom + 56 }]}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("ScheduleForm")}
+            style={styles.panelBtn}
+            activeOpacity={0.9}
+          >
+            <Text style={styles.panelBtnText}>Plan Next Week</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={seedTodayForTest}
+            style={styles.panelBtnSecondary}
+            activeOpacity={0.9}
+          >
+            <Text style={styles.panelBtnTextSecondary}>Seed Today</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={onSOS}
+            style={styles.panelBtnDanger}
+            activeOpacity={0.9}
+          >
+            <Text style={styles.panelBtnTextDanger}>SOS</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       <TouchableOpacity
-        onPress={() => navigation.navigate("ScheduleForm")}
-        style={[styles.fab, { bottom: insets.bottom - 10 }]}
+        onPress={() => setShowActions((p) => !p)}
+        style={[styles.fabMain, { bottom: insets.bottom }]}
         activeOpacity={0.9}
       >
-        <Text style={styles.fabText}>Plan Next Week</Text>
+        <Ionicons
+          name={showActions ? "close" : "ellipsis-vertical"}
+          size={18}
+          color={"#1C1C1C"}
+        />
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -447,4 +499,79 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   fabText: { color: "#1C1C1C", fontWeight: "700" },
+  fabSmall: {
+    position: "absolute",
+    right: 16,
+    borderRadius: 16,
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    height: 40,
+    paddingHorizontal: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+  },
+  fabSmallText: { color: colors.textPrimary, fontWeight: "600", fontSize: 13 },
+  actionsPanel: {
+    position: "absolute",
+    right: 16,
+    gap: 10,
+    alignItems: "flex-end",
+  },
+  fabMain: {
+    position: "absolute",
+    right: 16,
+    borderRadius: 22,
+    backgroundColor: colors.accent,
+    height: 44,
+    width: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 8,
+  },
+  fabDanger: {
+    position: "absolute",
+    right: 16,
+    borderRadius: 22,
+    backgroundColor: colors.danger,
+    height: 44,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+  },
+  fabDangerText: { color: "#fff", fontWeight: "800" },
+  panelBtn: {
+    backgroundColor: colors.accent,
+    paddingHorizontal: 14,
+    height: 40,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 140,
+  },
+  panelBtnText: { color: "#1C1C1C", fontWeight: "700" },
+  panelBtnSecondary: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 14,
+    height: 36,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 140,
+  },
+  panelBtnTextSecondary: { color: colors.textPrimary, fontWeight: "600" },
+  panelBtnDanger: {
+    backgroundColor: colors.danger,
+    paddingHorizontal: 14,
+    height: 40,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 140,
+  },
+  panelBtnTextDanger: { color: "#fff", fontWeight: "700" },
 });

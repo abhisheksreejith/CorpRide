@@ -102,13 +102,13 @@ export default function LoginScreen() {
           disabled={state.isSubmitting || !state.email || !state.password}
         />
 
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={[styles.linkButton, { marginTop: 12 }]}
           disabled={!googleRequest}
           onPress={() => googleRequest && promptGoogle()}
         >
           <Text style={styles.linkText}>Continue with Google</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity style={styles.linkButton}>
           <Text style={styles.linkText}>Forgot the password?</Text>

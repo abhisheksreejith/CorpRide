@@ -70,7 +70,7 @@ export default function AdminDashboardScreen() {
           style={{ width: "100%", height: 48 }}
         />
         <AppButton
-          title="Add New Employee"
+          title="Add New Employee (MOCK)"
           variant="secondary"
           onPress={async () => {
             try {
